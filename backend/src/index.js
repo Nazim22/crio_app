@@ -6,6 +6,9 @@ const authRoutes = require('./routes/authRoutes'); // Import auth routes
 const app = express();
 app.use(express.json()); // Middleware to parse JSON
 
+const cors = require('cors');
+app.use(cors()); // Enable CORS for all routes
+
 // MongoDB Connection
 const startMongo = async () => {
     try {
@@ -17,8 +20,13 @@ const startMongo = async () => {
     }
 };
 
+// Root Route
+app.get('/', (req, res) => {
+    res.send('Backend is running successfully!');
+});
+
 // Use Auth Routes
-app.use('/', authRoutes);
+app.use('/auth', authRoutes); // Prefix all auth routes with '/auth'
 
 // Start Server
 const PORT = process.env.PORT || 5000;
