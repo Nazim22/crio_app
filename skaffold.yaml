@@ -1,0 +1,8 @@
+apiVersion: skaffold/v2beta29
+kind: Config
+metadata:
+  name: node-app-pipeline
+deploy:
+  kubectl:
+    manifests:
+      - K8s/*.yaml  # ✅ Make sure all Kubernetes YAML files are inside 'k8s' folder
