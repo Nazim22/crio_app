@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
+  namespace: staging  # ✅ Ensure deployment is in "staging" namespace
 spec:
   replicas: 2
   selector:
@@ -14,6 +15,6 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: gcr.io/YOUR_PROJECT_ID/frontend:latest
+          image: gcr.io/rosy-sunspot-449618-g4/frontend:latest
           ports:
             - containerPort: 80

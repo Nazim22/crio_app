@@ -1,0 +1,22 @@
+apiVersion: deploy.cloud.google.com/v1
+kind: DeliveryPipeline
+metadata:
+  name: node-app-pipeline
+description: Pipeline to deploy Node.js & MongoDB app to GKE
+serialPipeline:
+  stages:
+    - targetId: staging  # ✅ Only deploying to staging
+      profiles: []
+
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: staging
+description: Deploy app to GKE staging environment
+gke:
+  cluster: projects/rosy-sunspot-449618-g4/locations/us-central1/clusters/my-gke-cluster
+executionConfigs:
+  - defaultPool:
+      serviceAccount: projects/rosy-sunspot-449618-g4/serviceAccounts/cloud-deploy-sa@rosy-sunspot-449618-g4.iam.gserviceaccount.com
+    usages: ["RENDER", "DEPLOY"]  # ✅ Fix: Add required usages
