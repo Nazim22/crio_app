@@ -1,0 +1,18 @@
+steps:
+  # ✅ Build and push backend Docker image
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/backend:latest", "./backend"]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/$PROJECT_ID/backend:latest"]
+
+  # ✅ Build and push frontend Docker image
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/frontend:latest", "./frontend"]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/$PROJECT_ID/frontend:latest"]
+
+images:
+  - "gcr.io/$PROJECT_ID/backend:latest"
+  - "gcr.io/$PROJECT_ID/frontend:latest"
