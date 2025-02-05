@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
-  namespace: staging  # ✅ Ensure deployment is in "staging" namespace
+  namespace: staging
 spec:
   replicas: 2
   selector:
@@ -18,3 +18,6 @@ spec:
           image: gcr.io/rosy-sunspot-449618-g4/frontend:latest
           ports:
             - containerPort: 80
+          env:
+            - name: REACT_APP_BACKEND_URL
+              value: "http://backend-service:5000"
