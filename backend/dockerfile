@@ -12,7 +12,7 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-# Expose the application port
+# Expose the application port to run
 EXPOSE 5000
 
 # Start the application
