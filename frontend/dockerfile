@@ -25,5 +25,5 @@ COPY --from=0 /app/build /usr/share/nginx/html
 # Expose the frontend port
 EXPOSE 80
 
-# Start Nginx
+# Start Nginx server
 CMD ["nginx", "-g", "daemon off;"]
