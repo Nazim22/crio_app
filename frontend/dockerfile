@@ -22,7 +22,7 @@ FROM nginx:stable-alpine
 # Copy the built frontend app to the Nginx container
 COPY --from=0 /app/build /usr/share/nginx/html
 
-# Expose the frontend port
+# Expose the frontend port for access
 EXPOSE 80
 
 # Start Nginx server
