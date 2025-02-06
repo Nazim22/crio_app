@@ -5,14 +5,14 @@ on:
     branches:
       - main
     paths:
-      - 'frontend/**'       # Only trigger if frontend files change
-      - 'backend/**'        # Only trigger if backend files change
+      - 'frontend/**'       # Run if frontend files change
+      - 'backend/**'        # Run if backend files change
+      - 'frontend/Dockerfile' # Run if frontend Dockerfile changes
+      - 'backend/Dockerfile'  # Run if backend Dockerfile changes
       - '!K8s/**'           # Ignore changes in K8s
       - '!GCP_infra/**'     # Ignore changes in GCP Terraform files
       - '!VM_Instance/**'   # Ignore changes in VM Terraform files
       - '!README.md'        # Ignore README updates
-      - 'frontend/Dockerfile' # Run if frontend Dockerfile changes
-      - 'backend/Dockerfile'  # Run if backend Dockerfile changes
 
 jobs:
   checkout:
@@ -33,7 +33,7 @@ jobs:
       - name: Run SonarQube Code Scan
         uses: SonarSource/sonarqube-scan-action@v4
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # ✅ Ensure SONAR_TOKEN is passed
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           projectBaseDir: .
           args: >
@@ -45,7 +45,7 @@ jobs:
     name: "Stage 3 - Build Frontend Docker Image"
     runs-on: self-hosted
     needs: code-scan
-    if: contains(github.event.head_commit.message, 'frontend') || contains(github.event.head_commit.message, 'Dockerfile')
+    if: ${{ contains(toJson(github.event.commits.*.modified), 'frontend/') || contains(toJson(github.event.commits.*.modified), 'frontend/Dockerfile') }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -60,7 +60,7 @@ jobs:
     name: "Stage 4 - Build Backend Docker Image"
     runs-on: self-hosted
     needs: code-scan
-    if: contains(github.event.head_commit.message, 'backend') || contains(github.event.head_commit.message, 'Dockerfile')
+    if: ${{ contains(toJson(github.event.commits.*.modified), 'backend/') || contains(toJson(github.event.commits.*.modified), 'backend/Dockerfile') }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
