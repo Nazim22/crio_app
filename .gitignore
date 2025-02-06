@@ -1,2 +1,9 @@
 node_modules/
 .env
+# Ignore Terraform local state files and cache
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+VM_instance/terraform.tfvars
