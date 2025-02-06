@@ -16,7 +16,7 @@ const startMongo = async () => {
         console.log('Connected to MongoDB Cluster');
     } catch (err) {
         console.error('Error connecting to MongoDB:', err.message);
-        process.exit(1); // Exit process on failure
+        process.exit(1); // Exit process on failure..
     }
 };
 
