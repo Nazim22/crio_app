@@ -11,6 +11,8 @@ on:
       - '!GCP_infra/**'     # Ignore changes in GCP Terraform files
       - '!VM_Instance/**'   # Ignore changes in VM Terraform files
       - '!README.md'        # Ignore README updates
+      - 'frontend/Dockerfile' # Run if frontend Dockerfile changes
+      - 'backend/Dockerfile'  # Run if backend Dockerfile changes
 
 jobs:
   checkout:
