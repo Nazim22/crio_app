@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
     res.send('Backend is running successfully!');
 });
 
-// Use Auth Routes
+// Use Auth Routes for authentication
 app.use('/auth', authRoutes); // Prefix all auth routes with '/auth'
 
 // Start Server
