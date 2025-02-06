@@ -4,15 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'frontend/**'       # Run if frontend files change
-      - 'backend/**'        # Run if backend files change
-      - 'frontend/Dockerfile' # Run if frontend Dockerfile changes
-      - 'backend/Dockerfile'  # Run if backend Dockerfile changes
-      - '!K8s/**'           # Ignore changes in K8s
-      - '!GCP_infra/**'     # Ignore changes in GCP Terraform files
-      - '!VM_Instance/**'   # Ignore changes in VM Terraform files
-      - '!README.md'        # Ignore README updates
 
 jobs:
   checkout:
@@ -41,11 +32,32 @@ jobs:
             -Dsonar.organization=my-org
             -Dsonar.host.url=http://34.41.33.191:9000
 
-  build-frontend:
-    name: "Stage 3 - Build Frontend Docker Image"
+  detect-changes:
+    name: "Stage 3 - Detect Changes"
     runs-on: self-hosted
-    needs: code-scan
-    if: ${{ contains(toJson(github.event.commits.*.modified), 'frontend/') || contains(toJson(github.event.commits.*.modified), 'frontend/Dockerfile') }}
+    needs: checkout
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Check Modified Files
+        id: filter
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+            backend:
+              - 'backend/**'
+
+  build-frontend:
+    name: "Stage 4 - Build Frontend Docker Image"
+    runs-on: self-hosted
+    needs: [code-scan, detect-changes]
+    if: needs.detect-changes.outputs.frontend == 'true'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -57,10 +69,10 @@ jobs:
         run: docker build -t docker.io/${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest frontend/
 
   build-backend:
-    name: "Stage 4 - Build Backend Docker Image"
+    name: "Stage 5 - Build Backend Docker Image"
     runs-on: self-hosted
-    needs: code-scan
-    if: ${{ contains(toJson(github.event.commits.*.modified), 'backend/') || contains(toJson(github.event.commits.*.modified), 'backend/Dockerfile') }}
+    needs: [code-scan, detect-changes]
+    if: needs.detect-changes.outputs.backend == 'true'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -72,7 +84,7 @@ jobs:
         run: docker build -t docker.io/${{ secrets.DOCKERHUB_USERNAME }}/backend:latest backend/
 
   scan-frontend-image:
-    name: "Stage 5 - Scan Frontend Docker Image (Trivy)"
+    name: "Stage 6 - Scan Frontend Docker Image (Trivy)"
     runs-on: self-hosted
     needs: build-frontend
     steps:
@@ -84,7 +96,7 @@ jobs:
           severity: 'HIGH,CRITICAL'
 
   scan-backend-image:
-    name: "Stage 6 - Scan Backend Docker Image (Trivy)"
+    name: "Stage 7 - Scan Backend Docker Image (Trivy)"
     runs-on: self-hosted
     needs: build-backend
     steps:
@@ -96,7 +108,7 @@ jobs:
           severity: 'HIGH,CRITICAL'
 
   push-frontend-image:
-    name: "Stage 7 - Push Frontend Docker Image"
+    name: "Stage 8 - Push Frontend Docker Image"
     runs-on: self-hosted
     needs: scan-frontend-image
     steps:
@@ -107,7 +119,7 @@ jobs:
         run: docker push docker.io/${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
 
   push-backend-image:
-    name: "Stage 8 - Push Backend Docker Image"
+    name: "Stage 9 - Push Backend Docker Image"
     runs-on: self-hosted
     needs: scan-backend-image
     steps:
