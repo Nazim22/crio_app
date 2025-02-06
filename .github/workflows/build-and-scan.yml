@@ -30,13 +30,14 @@ jobs:
 
       - name: Run SonarQube Code Scan
         uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # ✅ Ensure SONAR_TOKEN is passed
         with:
           projectBaseDir: .
           args: >
             -Dsonar.projectKey=my-project
             -Dsonar.organization=my-org
             -Dsonar.host.url=http://34.41.33.191:9000
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
   build-frontend:
     name: "Stage 3 - Build Frontend Docker Image"
